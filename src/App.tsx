@@ -307,14 +307,24 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
 }
 
 async function renderPoster(gift: Gift, qr: string): Promise<string> {
-  if (document.fonts) {
-    try { await document.fonts.ready; await document.fonts.load('400 31px "Moonlit Kai"'); }
-    catch (error) { console.warn('Poster font loading failed; using browser fallback:', error); }
-  }
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1600;
   const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('当前浏览器无法创建图片画布');
   const loadImage = (url: string, label: string) => new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = () => reject(new Error(`${label}加载失败，请检查网络后重试`)); img.src = url; });
-  const [landscape, code] = await Promise.all([loadImage('/assets/moon-landscape.jpg', '海报背景'), loadImage(qr, '分享二维码')]);
+  const fontReady = async () => {
+    if (!document.fonts) return;
+    try {
+      if (document.fonts.check('400 31px "Moonlit Kai"')) return;
+      await Promise.race([
+        document.fonts.load('400 31px "Moonlit Kai"'),
+        new Promise<void>(resolve => setTimeout(resolve, 450)),
+      ]);
+    } catch (error) { console.warn('Poster font loading failed; using browser fallback:', error); }
+  };
+  const [landscape, code] = await Promise.all([
+    loadImage('/assets/moon-landscape.jpg', '海报背景'),
+    loadImage(qr, '分享二维码'),
+    fontReady(),
+  ]).then(([landscape, code]) => [landscape, code] as const);
   const theme = themes[gift.audience];
   ctx.fillStyle = '#f5f2e9'; ctx.fillRect(0, 0, 1080, 1600);
   ctx.drawImage(landscape, 0, 0, 1080, 720);
