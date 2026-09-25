@@ -337,4 +337,5 @@ html,body{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!importan
 .poster-share-tip>span{display:grid;gap:2px;text-align:left}
 .poster-share-tip strong{font-size:15px;font-weight:600;color:#52634d}
 .poster-share-tip small{line-height:1.55}
+.qr-retry{display:block;margin:8px auto;padding:8px 10px;color:#8c6748;font-size:13px;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:700px){.share-paths .poster-action{min-height:88px;padding:14px 12px}.share-link-fallback{font-size:14px}.poster-share-tip{align-items:flex-start}.poster-share-tip strong{font-size:16px}}

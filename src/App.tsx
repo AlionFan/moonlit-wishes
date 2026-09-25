@@ -243,6 +243,7 @@ function Maker({ current, onClose, onCreate }: { current: Gift; onClose: () => v
 
 function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => void; notify: (text: string) => void }) {
   const [qr, setQr] = useState('');
+  const [qrError, setQrError] = useState(false);
   const [poster, setPoster] = useState('');
   const [busy, setBusy] = useState(false);
   const [manualCopy, setManualCopy] = useState(false);
@@ -250,7 +251,13 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
   const url = giftUrl(gift);
   const theme = themes[gift.audience];
   const inWeChat = /MicroMessenger/i.test(navigator.userAgent);
-  useEffect(() => { QRCode.toDataURL(url, { width: 640, margin: 2, color: { dark: '#344b3e', light: '#ffffff' }, errorCorrectionLevel: 'M' }).then(setQr).catch(() => notify('二维码生成失败，可以先复制链接分享。')); }, [url]);
+  async function generateQr() {
+    setQr('');
+    setQrError(false);
+    try { setQr(await QRCode.toDataURL(url, { width: 640, margin: 2, color: { dark: '#344b3e', light: '#ffffff' }, errorCorrectionLevel: 'M' })); }
+    catch (error) { console.error('QR generation failed:', error); setQrError(true); }
+  }
+  useEffect(() => { void generateQr(); }, [url]);
   async function copyLink() {
     try { await navigator.clipboard.writeText(url); void trackCardEvent('share_copy', gift); notify('链接已复制，去微信发给牵挂的人吧。'); }
     catch { setManualCopy(true); }
@@ -258,7 +265,11 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
   async function makePoster() {
     setBusy(true);
     try { const png = await renderPoster(gift, qr); setPoster(png); void trackCardEvent('share_poster', gift); }
-    catch { notify('海报暂时没生成成功，请重试或先分享链接。'); }
+    catch (error) {
+      console.error('Poster export failed:', error);
+      const detail = error instanceof Error ? error.message : '';
+      notify(detail ? `海报生成失败：${detail}` : '海报生成失败，请重试；若仍失败，请把手机型号和提示发给我。');
+    }
     finally { setBusy(false); }
   }
   return <Dialog onClose={onClose} title="分享音乐心意卡" className="share-dialog">
@@ -281,6 +292,7 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
           {busy ? <span className="loader"/> : <ArrowRight size={20}/>}
         </button>
       </div>
+      {qrError && <button className="qr-retry" onClick={() => { void generateQr(); }}>二维码暂时没生成出来，点此重试</button>}
       <button className="share-link-fallback" aria-expanded={linkGuideOpen} onClick={() => setLinkGuideOpen(open => !open)}>
         <Info size={15}/><span>{linkGuideOpen ? '收起链接备用方式' : '备用方式：通过链接分享'}</span><ArrowRight size={15}/>
       </button>
@@ -295,12 +307,14 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
 }
 
 async function renderPoster(gift: Gift, qr: string): Promise<string> {
-  await document.fonts.ready;
-  await document.fonts.load('400 31px "Moonlit Kai"');
+  if (document.fonts) {
+    try { await document.fonts.ready; await document.fonts.load('400 31px "Moonlit Kai"'); }
+    catch (error) { console.warn('Poster font loading failed; using browser fallback:', error); }
+  }
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1600;
-  const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
-  const loadImage = (url: string) => new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = url; });
-  const [landscape, code] = await Promise.all([loadImage('/assets/moon-landscape.jpg'), loadImage(qr)]);
+  const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('当前浏览器无法创建图片画布');
+  const loadImage = (url: string, label: string) => new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = () => reject(new Error(`${label}加载失败，请检查网络后重试`)); img.src = url; });
+  const [landscape, code] = await Promise.all([loadImage('/assets/moon-landscape.jpg', '海报背景'), loadImage(qr, '分享二维码')]);
   const theme = themes[gift.audience];
   ctx.fillStyle = '#f5f2e9'; ctx.fillRect(0, 0, 1080, 1600);
   ctx.drawImage(landscape, 0, 0, 1080, 720);
@@ -321,5 +335,7 @@ async function renderPoster(gift: Gift, qr: string): Promise<string> {
   ctx.drawImage(code, 400, 1130, 280, 280);
   ctx.fillStyle = '#354d3e'; ctx.font = '400 27px "Moonlit Kai", serif'; ctx.fillText('长按识别 · 听一曲温柔的祝福', 540, 1445);
   ctx.fillStyle = '#85877b'; ctx.font = '22px sans-serif'; ctx.fillText('由 岩火AI教育 温暖支持', 540, 1515);
-  return canvas.toDataURL('image/png');
+  const poster = canvas.toDataURL('image/png');
+  if (!poster.startsWith('data:image/png;base64,')) throw new Error('当前浏览器无法导出图片，请刷新页面后重试');
+  return poster;
 }
