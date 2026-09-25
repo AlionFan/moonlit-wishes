@@ -317,3 +317,12 @@ html,body{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!importan
 /* The two nested outlines made the reading card look like a framed panel. */
 .card-stage .stage-frame{display:none}
 .card-stage{border-color:transparent;box-shadow:none}
+
+/* In the WeChat share step this is an instruction, not another action control. */
+.share-paths .wechat-share-guide{min-height:0;margin:0;padding:8px 4px 14px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#63715d;align-items:flex-start;gap:11px}
+.wechat-share-guide>svg{flex:none;margin:2px 0 0;color:#8b987c;stroke-width:1.6}
+.wechat-share-guide .share-path-copy strong{font-size:16px;font-weight:600;line-height:1.55;color:#52634d}
+.wechat-share-guide .share-path-copy small{margin-top:2px;color:#818a78;font-size:13px;line-height:1.65}
+.wechat-share-arrow{position:fixed;z-index:101;top:0;right:8px;width:64px;height:72px;color:#728467;opacity:.48;pointer-events:none;animation:wechat-arrow-nudge 1.7s ease-in-out infinite}
+.wechat-share-arrow svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+@keyframes wechat-arrow-nudge{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-3px)}}

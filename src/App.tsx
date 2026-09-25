@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowRight, ArrowLeft, Check, Copy, Hand, Headphones, Mail, Moon, Music2, Pause, PenLine, Play, RotateCcw, Volume2, VolumeX, X, Timer, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeft, Check, Copy, Hand, Headphones, Info, Mail, Moon, Music2, Pause, PenLine, Play, RotateCcw, Volume2, VolumeX, X, Timer, Sparkles } from 'lucide-react';
 import QRCode from 'qrcode';
 import { themes, stories, tracks, freshGift, readGift, giftUrl, formatTime } from './content';
 import type { Gift } from './content';
@@ -248,6 +248,7 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
   const [manualCopy, setManualCopy] = useState(false);
   const url = giftUrl(gift);
   const theme = themes[gift.audience];
+  const inWeChat = /MicroMessenger/i.test(navigator.userAgent);
   useEffect(() => { QRCode.toDataURL(url, { width: 640, margin: 2, color: { dark: '#344b3e', light: '#ffffff' }, errorCorrectionLevel: 'M' }).then(setQr).catch(() => notify('二维码生成失败，可以先复制链接分享。')); }, [url]);
   async function copyLink() {
     try { await navigator.clipboard.writeText(url); void trackCardEvent('share_copy', gift); notify('链接已复制，去微信发给牵挂的人吧。'); }
@@ -260,6 +261,7 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
     finally { setBusy(false); }
   }
   return <Dialog onClose={onClose} title="分享音乐心意卡" className="share-dialog">
+    {!poster && inWeChat && <div className="wechat-share-arrow" aria-hidden="true"><svg viewBox="0 0 64 72"><path d="M5 68C8 40 25 22 54 10M37 7l18 2-2 18"/></svg></div>}
     {poster ? <>
       <h2>图片卡片做好了。</h2>
       <p>长按保存图片，再发送给朋友。</p>
@@ -273,9 +275,8 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
       <p>送给 <strong>{gift.recipient || theme.label}</strong> 的音乐祝福，选择一种方式送出。</p>
       <div className="share-paths">
         <div className="wechat-share-guide">
-          <span className="share-path-number">01</span>
-          <span className="share-path-copy"><strong>分享音乐卡链接</strong><small>点击右上角「···」转发给微信好友，点开即可听音乐。</small></span>
-          <ArrowUpRight size={20}/>
+          <Info size={19} aria-hidden="true"/>
+          <span className="share-path-copy"><strong>点击右上角「···」</strong><small>选择“转发给朋友”，即可把这份音乐心意送给对方。</small></span>
         </div>
         <button className="poster-action" onClick={makePoster} disabled={busy || !qr}>
           <span className="share-path-number">02</span>
