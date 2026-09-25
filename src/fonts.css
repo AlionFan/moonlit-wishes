@@ -1,0 +1,49 @@
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/noto-serif-sc-0.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/noto-serif-sc-1.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/noto-serif-sc-2.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/noto-serif-sc-3.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Moonlit Ma Shan Zheng';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/ma-shan-zheng.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Moonlit Long Cang';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/long-cang.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Moonlit Liu Jian Mao Cao';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/liu-jian-mao-cao.woff2) format('woff2');
+}

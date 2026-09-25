@@ -1,0 +1,15 @@
+{
+  "site_name": "月下寄心意",
+  "status": "deployed_and_verified",
+  "platform": "Joybeat",
+  "url": "https://mid-autumn.joybeat.cn/",
+  "server": "82.156.0.31",
+  "container": "joybeat-mid-autumn",
+  "server_path": "/srv/apps/mid-autumn",
+  "release": "20260925T065340Z",
+  "verified_on": "2026-09-25",
+  "dns": { "type": "A", "name": "mid-autumn.joybeat.cn", "value": "82.156.0.31", "ttl": 600 },
+  "tls": { "issuer": "Let's Encrypt YR2", "subject": "mid-autumn.joybeat.cn", "expires_at": "2026-12-24T03:09:43Z", "managed_by": "Existing Traefik letsencrypt resolver" },
+  "checks": { "container": "healthy", "analytics_container": "healthy", "https": 200, "stats_page": 200, "stats_without_token": 401, "share_bundle": "index-Cry23pF3.js", "share_styles": "index-DtVx76CK.css", "font": "KaiTi system font stack", "final_page_share_action": "removed" },
+  "limitations": ["KaiTi appearance depends on fonts installed on the visitor's device; unsupported devices fall back to a system serif font.", "Direct WeChat sharing has not been tested in the native WeChat client; behavior may vary by client version.", "Custom WeChat JS-SDK share previews are not configured."]
+}

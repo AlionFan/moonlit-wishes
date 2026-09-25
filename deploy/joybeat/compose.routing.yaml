@@ -1,0 +1,15 @@
+services:
+  web:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: coolify
+      traefik.http.services.joybeat-mid-autumn.loadbalancer.server.port: "80"
+      traefik.http.routers.joybeat-mid-autumn-http.rule: Host(`${MOONLIT_DOMAIN}`)
+      traefik.http.routers.joybeat-mid-autumn-http.entrypoints: http
+      traefik.http.routers.joybeat-mid-autumn-http.middlewares: joybeat-mid-autumn-https
+      traefik.http.middlewares.joybeat-mid-autumn-https.redirectscheme.scheme: https
+      traefik.http.middlewares.joybeat-mid-autumn-https.redirectscheme.permanent: "true"
+      traefik.http.routers.joybeat-mid-autumn.rule: Host(`${MOONLIT_DOMAIN}`)
+      traefik.http.routers.joybeat-mid-autumn.entrypoints: https
+      traefik.http.routers.joybeat-mid-autumn.tls: "true"
+      traefik.http.routers.joybeat-mid-autumn.tls.certresolver: letsencrypt
