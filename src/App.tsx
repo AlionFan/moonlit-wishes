@@ -246,6 +246,7 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
   const [poster, setPoster] = useState('');
   const [busy, setBusy] = useState(false);
   const [manualCopy, setManualCopy] = useState(false);
+  const [linkGuideOpen, setLinkGuideOpen] = useState(false);
   const url = giftUrl(gift);
   const theme = themes[gift.audience];
   const inWeChat = /MicroMessenger/i.test(navigator.userAgent);
@@ -261,31 +262,33 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
     finally { setBusy(false); }
   }
   return <Dialog onClose={onClose} title="分享音乐心意卡" className="share-dialog">
-    {!poster && inWeChat && <div className="wechat-share-arrow" aria-hidden="true"><svg viewBox="0 0 64 72"><path d="M5 68C8 40 25 22 54 10M37 7l18 2-2 18"/></svg></div>}
+    {!poster && linkGuideOpen && inWeChat && <div className="wechat-share-arrow" aria-hidden="true"><svg viewBox="0 0 64 72"><path d="M5 68C8 40 25 22 54 10M37 7l18 2-2 18"/></svg></div>}
     {poster ? <>
       <h2>图片卡片做好了。</h2>
-      <p>长按保存图片，再发送给朋友。</p>
+      <p>长按海报，在菜单中选择“发送给朋友”。</p>
       <img className="exported-poster" src={poster} alt={`送给${gift.recipient || theme.label}的音乐卡片图片，含可扫码听音乐的二维码`}/>
-      <div className="poster-share-tip"><Hand size={17}/><span>长按保存或分享图片<br/><small>朋友扫描图片中的二维码，即可打开音乐卡</small></span></div>
+      <div className="poster-share-tip"><Hand size={19}/><span><strong>长按图片 → 发送给朋友</strong><small>也可先保存到相册再发送；朋友扫码即可听音乐祝福。</small></span></div>
       <button className="text-button" onClick={() => setPoster('')}><ArrowLeft size={15}/>返回分享方式</button>
     </> : <>
       <div className="share-mark"><Check size={27}/></div>
       <div className="eyebrow">SEALED WITH A LITTLE MOONLIGHT</div>
-      <h2>你的心意，准备好了。</h2>
-      <p>送给 <strong>{gift.recipient || theme.label}</strong> 的音乐祝福，选择一种方式送出。</p>
+      <h2>把这份心意送给 {gift.recipient || theme.label}。</h2>
+      <p>推荐先制作图片海报，长按即可分享给朋友。</p>
       <div className="share-paths">
-        <div className="wechat-share-guide">
-          <Info size={19} aria-hidden="true"/>
-          <span className="share-path-copy"><strong>点击右上角「···」</strong><small>选择“转发给朋友”，即可把这份音乐心意送给对方。</small></span>
-        </div>
         <button className="poster-action" onClick={makePoster} disabled={busy || !qr}>
-          <span className="share-path-number">02</span>
-          <span className="share-path-copy"><strong>{busy ? '正在制作图片卡片…' : '制作音乐卡片图片'}</strong><small>长按保存图片，再发给朋友；扫码即可听音乐。</small></span>
+          <span className="share-path-number">01</span>
+          <span className="share-path-copy"><strong>{busy ? '正在制作图片海报…' : '制作图片海报'}</strong><small>完成后长按海报，选择“发送给朋友”；扫码可听音乐。</small></span>
           {busy ? <span className="loader"/> : <ArrowRight size={20}/>}
         </button>
       </div>
-      <button className="copy-share-link" onClick={copyLink}><Copy size={15}/>复制音乐卡链接</button>
-      {manualCopy && <label className="manual-copy">长按复制下方链接<input readOnly value={url} onFocus={e => e.target.select()}/></label>}
+      <button className="share-link-fallback" aria-expanded={linkGuideOpen} onClick={() => setLinkGuideOpen(open => !open)}>
+        <Info size={15}/><span>{linkGuideOpen ? '收起链接备用方式' : '备用方式：通过链接分享'}</span><ArrowRight size={15}/>
+      </button>
+      {linkGuideOpen && <>
+        <div className="wechat-share-guide"><Info size={18} aria-hidden="true"/><span className="share-path-copy"><strong>点击右上角「···」</strong><small>选择“转发给朋友”分享音乐卡；也可以复制链接发送。</small></span></div>
+        <button className="copy-share-link" onClick={copyLink}><Copy size={15}/>复制音乐卡链接</button>
+        {manualCopy && <label className="manual-copy">长按复制下方链接<input readOnly value={url} onFocus={e => e.target.select()}/></label>}
+      </>}
       {['localhost', '127.0.0.1'].includes(location.hostname) && <p className="local-share-note">当前为本机预览，发布后即可分享给朋友。</p>}
     </>}
   </Dialog>;

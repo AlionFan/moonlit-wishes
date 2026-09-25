@@ -326,3 +326,15 @@ html,body{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!importan
 .wechat-share-arrow{position:fixed;z-index:101;top:0;right:4px;width:78px;height:86px;color:#536b45;opacity:.82;pointer-events:none;filter:drop-shadow(0 1px 2px #f6f4ed);animation:wechat-arrow-nudge 1.25s ease-in-out infinite}
 .wechat-share-arrow svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}
 @keyframes wechat-arrow-nudge{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,-4px)}}
+.share-paths{gap:5px}
+.share-paths .poster-action{min-height:88px;padding:15px 17px}
+.share-link-fallback{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;margin:7px auto 0;padding:5px 8px;color:#78836f;font-size:13px;background:transparent;border:0;box-shadow:none}
+.share-link-fallback svg{flex:none;stroke-width:1.6}
+.share-link-fallback:hover{color:#52634d}
+.share-dialog .wechat-share-guide{margin-top:4px;padding:8px 4px 2px}
+.share-dialog .wechat-share-guide .share-path-copy strong{font-size:15px}
+.share-dialog .wechat-share-guide .share-path-copy small{font-size:12px}
+.poster-share-tip>span{display:grid;gap:2px;text-align:left}
+.poster-share-tip strong{font-size:15px;font-weight:600;color:#52634d}
+.poster-share-tip small{line-height:1.55}
+@media(max-width:700px){.share-paths .poster-action{min-height:88px;padding:14px 12px}.share-link-fallback{font-size:14px}.poster-share-tip{align-items:flex-start}.poster-share-tip strong{font-size:16px}}
