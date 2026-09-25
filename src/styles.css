@@ -243,13 +243,17 @@ html,body{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!importan
 :root{--wechat-font-scale:1;--wechat-heading-scale:1}
 @media(max-width:700px){
   .card-stage{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  /* Let the content breathe on phones; the ornamental inset frame reads like a second card edge. */
+  .card-stage{border-color:transparent;box-shadow:none}
+  .card-stage .stage-frame{display:none}
   .card-stage>.card-content{height:auto;min-height:100%}
   .card-stage.page-0>.card-content,.card-stage.page-0 .cover-layout{height:auto;min-height:clamp(560px,calc(100dvh - 285px),700px)}
   .card-stage.page-0 .cover-copy{padding-bottom:clamp(90px,25vw,125px)}
   .card-content:has(.story-layout),.card-content:has(.letter-layout),.card-content:has(.wishes-layout),.card-content:has(.ritual-layout),.card-content:has(.music-layout){height:auto;min-height:100%}
   .received-label{max-width:100%;flex-wrap:wrap;overflow-wrap:anywhere}
   .cover-footnote,.ending-note,.music-note,.below-player{max-width:100%;white-space:normal;overflow-wrap:anywhere}
-  .scroll-cue{max-width:100%;font-size:clamp(12px,3.8vw,14px);letter-spacing:0}
+  /* Keep the reading hint in normal flow so it can never cover the last line. */
+  .scroll-cue{position:relative;inset:auto;z-index:2;max-width:100%;height:auto;min-height:38px;margin:0;padding:9px 12px 14px;background:transparent;align-items:center;font-size:clamp(12px,3.8vw,14px);letter-spacing:0}
 }
 @media(max-width:700px){
   html[data-wechat-font-adaptation="enabled"] .site-header{height:auto;min-height:62px;padding-top:5px;padding-bottom:5px}

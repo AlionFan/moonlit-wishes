@@ -77,7 +77,7 @@ export default function App() {
     if (!stage || !content) return;
     const update = () => {
       setIsOverflowing(content.scrollHeight - stage.clientHeight > 15);
-      setHasMore(content.scrollHeight - stage.scrollTop - stage.clientHeight > 15);
+      setHasMore(stage.scrollHeight - stage.scrollTop - stage.clientHeight > 15);
     };
     update();
     const observer = new ResizeObserver(update);
@@ -127,7 +127,7 @@ export default function App() {
       <div className="collection-topline"><span className="tiny-star">✧</span><span>中秋特别心意</span><span className="topline-rule"/><span className="collection-en">A LITTLE MOMENT OF PEACE</span></div>
       {received ? <div className="received-label"><Mail size={15}/>{gift.sender || '一位惦念你的人'}，为你寄来一份心意</div> : <div className="single-audience">一份专属于<span>{theme.label}</span>的中秋心意</div>}
 
-      <section ref={stageRef} className={`card-stage page-${page} ${isOverflowing ? 'is-overflowing' : ''}`} aria-label={STEPS[page]} tabIndex={0} onScroll={() => { const stage = stageRef.current; const content = stage?.querySelector<HTMLElement>('.card-content'); if (stage && content) setHasMore(content.scrollHeight - stage.scrollTop - stage.clientHeight > 15); }}
+      <section ref={stageRef} className={`card-stage page-${page} ${isOverflowing ? 'is-overflowing' : ''}`} aria-label={STEPS[page]} tabIndex={0} onScroll={() => { const stage = stageRef.current; if (stage) setHasMore(stage.scrollHeight - stage.scrollTop - stage.clientHeight > 15); }}
         onKeyDown={e => { if (e.target !== e.currentTarget) return; if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(page + 1); if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(page - 1); }}
         onTouchStart={e => { const stage = stageRef.current; touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, top: stage?.scrollTop || 0, max: Math.max(0, (stage?.scrollHeight || 0) - (stage?.clientHeight || 0)) }; }}
         onTouchEnd={e => { const start = touch.current; touch.current = null; if (!start || (e.target as HTMLElement).closest('button,input,textarea,a')) return; const dx = e.changedTouches[0].clientX - start.x; const dy = e.changedTouches[0].clientY - start.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { navigate(page + (dx < 0 ? 1 : -1)); return; } if (Math.abs(dy) > 75 && Math.abs(dy) > Math.abs(dx) * 1.3 && (start.max <= 5 || dy > 0 && start.top < 5 || dy < 0 && start.top >= start.max - 5)) navigate(page + (dy < 0 ? 1 : -1)); }}>
