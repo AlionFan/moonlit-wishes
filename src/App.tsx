@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowRight, ArrowLeft, Check, Copy, Download, Hand, Headphones, Mail, Moon, Music2, Pause, PenLine, Play, RotateCcw, Volume2, VolumeX, X, Timer, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeft, Check, Copy, Hand, Headphones, Mail, Moon, Music2, Pause, PenLine, Play, RotateCcw, Volume2, VolumeX, X, Timer, Sparkles } from 'lucide-react';
 import QRCode from 'qrcode';
 import { themes, stories, tracks, freshGift, readGift, giftUrl, formatTime } from './content';
 import type { Gift } from './content';
@@ -235,30 +235,10 @@ function Maker({ current, onClose, onCreate }: { current: Gift; onClose: () => v
   const [draft, setDraft] = useState<Gift>({ ...freshGift(current.audience), sender: '', track: current.track });
   const [error, setError] = useState('');
   const [suggestion, setSuggestion] = useState(0);
-  const [generating, setGenerating] = useState(false);
   const theme = themes[draft.audience];
   const update = <K extends keyof Gift>(key: K, value: Gift[K]) => setDraft(d => ({ ...d, [key]: value }));
   const suggestions = [theme.short, '月圆是团圆的模样，惦念是最暖的陪伴。愿你心有所安，岁岁皆欢喜。', '把忙碌交给昨天，把宁静留给今夜。愿一曲轻音伴你，愿一轮明月照你，愿生活温柔待你。'];
-  async function generateBlessing() {
-    setGenerating(true);
-    setError('');
-    try {
-      const response = await fetch('/api/blessings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audience: draft.audience }),
-      });
-      const result = await response.json() as { message?: unknown; error?: unknown };
-      if (!response.ok) throw new Error(typeof result.error === 'string' ? result.error : '暂时无法生成祝福，请稍后重试。');
-      if (typeof result.message !== 'string' || !result.message.trim()) throw new Error('DeepSeek 暂时没有写好，请稍后重试。');
-      update('message', result.message.trim().slice(0, 240));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '网络暂时不稳定，请稍后重试。');
-    } finally {
-      setGenerating(false);
-    }
-  }
-  return <Dialog onClose={onClose} title="制作音乐心意卡" className="maker-dialog"><div className="maker-intro"><div className="eyebrow"><span/> MAKE IT PERSONAL</div><h2>把你的心意，<br/>写进月光里。</h2><p>简单几笔，就是一份独一无二的祝福。</p><div className={`mini-card theme-${draft.audience}`}><span>一份专属心意</span><h3>致 {draft.recipient || theme.label}</h3><p>{draft.message || theme.short}</p><div className="mini-moon"/><small>{draft.sender || '你的名字'} 敬赠</small></div><span className="maker-preview-label">你的卡片预览</span></div><form className="maker-form" onSubmit={e => { e.preventDefault(); if (!draft.recipient.trim()) { setError('请写下收件人的名字或称呼。'); return; } if (!draft.sender.trim()) { setError('请留下你的署名，让对方知道你的心意。'); return; } onCreate({ ...draft, recipient: draft.recipient.trim(), sender: draft.sender.trim(), message: draft.message.trim() }); }}><fieldset className="maker-audience-choice"><legend>这张卡片送给谁？</legend><div className="maker-audience-options">{(['friend', 'elder', 'teacher'] as const).map(audience => <button type="button" key={audience} className={draft.audience === audience ? 'active' : ''} aria-pressed={draft.audience === audience} onClick={() => { setDraft(d => ({ ...d, audience, track: themes[audience].track })); setSuggestion(0); }}><span>{audience === 'friend' ? '朋友' : audience === 'elder' ? '长辈' : '师长'}</span></button>)}</div></fieldset><div className="maker-audience-note">已选择送给{draft.audience === 'elder' ? '长辈' : theme.label} · 可填写名字和专属祝福</div><div className="form-names"><label>对方的名字或称呼<input maxLength={16} placeholder="例如：王老师" value={draft.recipient} onChange={e => { update('recipient', e.target.value); setError(''); }} required/></label><label>你的署名<input maxLength={16} placeholder="例如：小林" value={draft.sender} onChange={e => { update('sender', e.target.value); setError(''); }} required/></label></div><label className="message-label"><span>想对 TA 说的话 <small>选填</small></span><textarea rows={4} maxLength={240} placeholder={theme.short} value={draft.message} onChange={e => update('message', e.target.value)}/></label><div className="message-actions"><div className="message-action-buttons"><button type="button" onClick={() => { update('message', suggestions[suggestion % suggestions.length]); setSuggestion(s => s + 1); }}><RotateCcw size={13}/>换一句范例</button><button type="button" className="deepseek-button" onClick={() => void generateBlessing()} disabled={generating}><Sparkles size={14}/>{generating ? 'DeepSeek 正在写…' : 'DeepSeek 帮我写'}</button></div><small>{draft.message.length}/240</small></div><label>选一首相伴的音乐<select value={draft.track} onChange={e => update('track', Number(e.target.value))}>{tracks.map((t, i) => <option key={t.title} value={i}>{t.title} · {t.mood}</option>)}</select></label>{error && <p className="form-error" role="alert">{error}</p>}<button type="submit" className="primary-button"><Sparkles size={17}/>生成我的心意卡<ArrowRight size={18}/></button><p className="form-note">无需登录；仅发送祝福对象类别，不会上传姓名或你已写的内容。</p></form></Dialog>;
+  return <Dialog onClose={onClose} title="制作音乐心意卡" className="maker-dialog"><div className="maker-intro"><div className="eyebrow"><span/> MAKE IT PERSONAL</div><h2>把你的心意，<br/>写进月光里。</h2><p>简单几笔，就是一份独一无二的祝福。</p><div className={`mini-card theme-${draft.audience}`}><span>一份专属心意</span><h3>致 {draft.recipient || theme.label}</h3><p>{draft.message || theme.short}</p><div className="mini-moon"/><small>{draft.sender || '你的名字'} 敬赠</small></div><span className="maker-preview-label">你的卡片预览</span></div><form className="maker-form" onSubmit={e => { e.preventDefault(); if (!draft.recipient.trim()) { setError('请写下收件人的名字或称呼。'); return; } if (!draft.sender.trim()) { setError('请留下你的署名，让对方知道你的心意。'); return; } onCreate({ ...draft, recipient: draft.recipient.trim(), sender: draft.sender.trim(), message: draft.message.trim() }); }}><fieldset className="maker-audience-choice"><legend>这张卡片送给谁？</legend><div className="maker-audience-options">{(['friend', 'elder', 'teacher'] as const).map(audience => <button type="button" key={audience} className={draft.audience === audience ? 'active' : ''} aria-pressed={draft.audience === audience} onClick={() => { setDraft(d => ({ ...d, audience, track: themes[audience].track })); setSuggestion(0); }}><span>{audience === 'friend' ? '朋友' : audience === 'elder' ? '长辈' : '师长'}</span></button>)}</div></fieldset><div className="maker-audience-note">已选择送给{draft.audience === 'elder' ? '长辈' : theme.label} · 可填写名字和专属祝福</div><div className="form-names"><label>对方的名字或称呼<input maxLength={16} placeholder="例如：王老师" value={draft.recipient} onChange={e => { update('recipient', e.target.value); setError(''); }} required/></label><label>你的署名<input maxLength={16} placeholder="例如：小林" value={draft.sender} onChange={e => { update('sender', e.target.value); setError(''); }} required/></label></div><label className="message-label"><span>想对 TA 说的话 <small>选填</small></span><textarea rows={4} maxLength={240} placeholder={theme.short} value={draft.message} onChange={e => update('message', e.target.value)}/></label><div className="message-actions"><button type="button" onClick={() => { update('message', suggestions[suggestion % suggestions.length]); setSuggestion(s => s + 1); }}><RotateCcw size={13}/>换一句范例</button><small>{draft.message.length}/240</small></div><label>选一首相伴的音乐<select value={draft.track} onChange={e => update('track', Number(e.target.value))}>{tracks.map((t, i) => <option key={t.title} value={i}>{t.title} · {t.mood}</option>)}</select></label>{error && <p className="form-error" role="alert">{error}</p>}<button type="submit" className="primary-button"><Sparkles size={17}/>生成我的心意卡<ArrowRight size={18}/></button><p className="form-note">无需登录；姓名和祝福只保存在你生成的分享链接中，不会上传到服务器。</p></form></Dialog>;
 }
 
 function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => void; notify: (text: string) => void }) {
@@ -279,11 +259,40 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
     catch { notify('海报暂时没生成成功，请重试或先分享链接。'); }
     finally { setBusy(false); }
   }
-  return <Dialog onClose={onClose} title="分享音乐心意卡" className="share-dialog">{poster ? <><h2>把心意，送到朋友手中。</h2><p>长按图片，分享这份心意。</p><img className="exported-poster" src={poster} alt={`送给${gift.recipient || theme.label}的音乐祝福海报，含可扫码打开卡片的二维码`}/><div className="poster-share-tip"><Hand size={17}/><span>长按图片分享给朋友<br/><small>若菜单中只有“保存图片”，保存后可在聊天中发送</small></span></div><button className="text-button" onClick={() => setPoster('')}><ArrowLeft size={15}/>返回分享</button></> : <><div className="share-mark"><Check size={27}/></div><div className="eyebrow">SEALED WITH A LITTLE MOONLIGHT</div><h2>你的心意，准备好了。</h2><p>送给 <strong>{gift.recipient || theme.label}</strong> 的这一份温柔，<br/>现在就可以出发。</p><div className="share-preview"><span className="share-preview-moon"><Moon size={26}/></span><div><strong>{theme.title.join('')}</strong><small>{gift.sender || '一位惦念你的人'} 敬赠 · {tracks[gift.track].title}</small></div>{qr ? <img src={qr} alt="扫码打开这张音乐祝福卡"/> : <span className="loader"/>}</div><div className="wechat-share-guide"><span className="wechat-menu-dots">···</span><span>点击右上角「···」<br/><strong>分享给微信好友</strong></span><ArrowUpRight size={18}/></div><div className="share-secondary"><button className="poster-action" onClick={makePoster} disabled={busy || !qr}><Download size={19}/><span><strong>{busy ? '正在制作海报…' : '制作心意海报'}</strong><small>生成图片后，长按即可分享给朋友</small></span><ArrowRight size={17}/></button><button className="copy-share-link" onClick={copyLink}><Copy size={15}/>复制卡片链接</button></div>{manualCopy && <label className="manual-copy">长按复制下方链接<input readOnly value={url} onFocus={e => e.target.select()}/></label>}<p className="share-help">{['localhost', '127.0.0.1'].includes(location.hostname) && <>当前为本机预览，公开发布后即可分享给朋友。<br/></>}分享后会以祝福卡链接和封面图展示，不会发送图片附件。<br/>收到的人也能继续制作自己的祝福。</p></>}</Dialog>;
+  return <Dialog onClose={onClose} title="分享音乐心意卡" className="share-dialog">
+    {poster ? <>
+      <h2>图片卡片做好了。</h2>
+      <p>长按保存图片，再发送给朋友。</p>
+      <img className="exported-poster" src={poster} alt={`送给${gift.recipient || theme.label}的音乐卡片图片，含可扫码听音乐的二维码`}/>
+      <div className="poster-share-tip"><Hand size={17}/><span>长按保存或分享图片<br/><small>朋友扫描图片中的二维码，即可打开音乐卡</small></span></div>
+      <button className="text-button" onClick={() => setPoster('')}><ArrowLeft size={15}/>返回分享方式</button>
+    </> : <>
+      <div className="share-mark"><Check size={27}/></div>
+      <div className="eyebrow">SEALED WITH A LITTLE MOONLIGHT</div>
+      <h2>你的心意，准备好了。</h2>
+      <p>送给 <strong>{gift.recipient || theme.label}</strong> 的音乐祝福，选择一种方式送出。</p>
+      <div className="share-paths">
+        <div className="wechat-share-guide">
+          <span className="share-path-number">01</span>
+          <span className="share-path-copy"><strong>分享音乐卡链接</strong><small>点击右上角「···」转发给微信好友，点开即可听音乐。</small></span>
+          <ArrowUpRight size={20}/>
+        </div>
+        <button className="poster-action" onClick={makePoster} disabled={busy || !qr}>
+          <span className="share-path-number">02</span>
+          <span className="share-path-copy"><strong>{busy ? '正在制作图片卡片…' : '制作音乐卡片图片'}</strong><small>长按保存图片，再发给朋友；扫码即可听音乐。</small></span>
+          {busy ? <span className="loader"/> : <ArrowRight size={20}/>}
+        </button>
+      </div>
+      <button className="copy-share-link" onClick={copyLink}><Copy size={15}/>复制音乐卡链接</button>
+      {manualCopy && <label className="manual-copy">长按复制下方链接<input readOnly value={url} onFocus={e => e.target.select()}/></label>}
+      {['localhost', '127.0.0.1'].includes(location.hostname) && <p className="local-share-note">当前为本机预览，发布后即可分享给朋友。</p>}
+    </>}
+  </Dialog>;
 }
 
 async function renderPoster(gift: Gift, qr: string): Promise<string> {
   await document.fonts.ready;
+  await document.fonts.load('600 31px "Noto Serif SC"');
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1600;
   const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
   const loadImage = (url: string) => new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = url; });
@@ -293,20 +302,20 @@ async function renderPoster(gift: Gift, qr: string): Promise<string> {
   ctx.drawImage(landscape, 0, 0, 1080, 720);
   const fade = ctx.createLinearGradient(0, 430, 0, 745); fade.addColorStop(0, '#f5f2e900'); fade.addColorStop(1, '#f5f2e9'); ctx.fillStyle = fade; ctx.fillRect(0, 430, 1080, 320);
   ctx.strokeStyle = '#b9ab8c'; ctx.lineWidth = 2; ctx.strokeRect(36, 36, 1008, 1528);
-  ctx.textAlign = 'center'; ctx.fillStyle = '#4d6251'; ctx.font = '32px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillText('月 下 寄 心 意', 540, 110);
-  ctx.font = '38px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillText(`致 ${gift.recipient || theme.label}`, 540, 580);
-  ctx.font = '68px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillStyle = '#354d3e'; ctx.fillText(theme.title.join(''), 540, 675, 930);
-  ctx.font = '31px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillStyle = '#5d655b';
+  ctx.textAlign = 'center'; ctx.fillStyle = '#4d6251'; ctx.font = '600 32px "Noto Serif SC", "Songti SC", serif'; ctx.fillText('月 下 寄 心 意', 540, 110);
+  ctx.font = '600 38px "Noto Serif SC", "Songti SC", serif'; ctx.fillText(`致 ${gift.recipient || theme.label}`, 540, 580);
+  ctx.font = '600 68px "Noto Serif SC", "Songti SC", serif'; ctx.fillStyle = '#354d3e'; ctx.fillText(theme.title.join(''), 540, 675, 930);
+  ctx.font = '600 31px "Noto Serif SC", "Songti SC", serif'; ctx.fillStyle = '#5d655b';
   const text = gift.message || theme.short;
   const lines: string[] = []; let line = '';
   for (const char of text) { if (char === '\n') { lines.push(line); line = ''; } else if (ctx.measureText(line + char).width > 820) { lines.push(line); line = char; } else line += char; }
   if (line) lines.push(line);
   const visible = lines.slice(0, 6); if (lines.length > 6) visible[5] = visible[5].slice(0, -1) + '…';
   visible.forEach((l, i) => ctx.fillText(l, 540, 760 + i * 50));
-  ctx.font = '28px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillText(`— ${gift.sender || '一位惦念你的人'} 敬赠`, 540, 1110);
+  ctx.font = '600 28px "Noto Serif SC", "Songti SC", serif'; ctx.fillText(`— ${gift.sender || '一位惦念你的人'} 敬赠`, 540, 1110);
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(code, 400, 1130, 280, 280);
-  ctx.fillStyle = '#354d3e'; ctx.font = '27px "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif'; ctx.fillText('长按识别 · 听一曲温柔的祝福', 540, 1445);
+  ctx.fillStyle = '#354d3e'; ctx.font = '600 27px "Noto Serif SC", "Songti SC", serif'; ctx.fillText('长按识别 · 听一曲温柔的祝福', 540, 1445);
   ctx.fillStyle = '#85877b'; ctx.font = '22px sans-serif'; ctx.fillText('由 岩火AI教育 温暖支持', 540, 1515);
   return canvas.toDataURL('image/png');
 }

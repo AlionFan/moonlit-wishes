@@ -25,7 +25,9 @@ npm run build
 ./scripts/deploy-joybeat.sh
 ```
 
-脚本上传新构建，校验必要文件后原子切换 `current`，保持域名配置，并重建本站两个容器以加载最新配置。Nginx 和 Python 镜像均固定版本，不修改共享代理和其他应用。每次完成后，请检查正式网址、音乐和统计页。
+脚本先上传并校验新构建，再通过原子替换 `current` 切换静态站点目录。常规网页发布不会重建 Web 容器；如果 Nginx 配置变化，会先校验配置，再执行 graceful reload。只有 analytics API 代码变化时才会单独重建统计容器，网页仍由原有 Web 容器持续提供。Compose 配置发生变化时，脚本会在切换流量前停止并提示，避免以普通网页发布的方式重建生产服务。Nginx 和 Python 镜像均固定版本，不修改共享代理和其他应用。
+
+发布后脚本会请求站点健康检查和首页；检查失败时会把 `current` 原子切回上一版。新版本文件在切换前已完整上传，切换过程只更新符号链接，因此静态页面不需要停服。若改动 analytics API，统计接口在该容器更新期间可能短暂不可用；静态页面不会受影响。该 API 目前只承载匿名统计，不包含 DeepSeek 祝福生成功能。
 
 ```sh
 ssh joybeat 'curl -fsSI https://mid-autumn.joybeat.cn/'
