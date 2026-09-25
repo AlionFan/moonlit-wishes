@@ -292,3 +292,30 @@ html,body{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!importan
   html[data-wechat-font-adaptation="enabled"] .ending-note,
   html[data-wechat-font-adaptation="enabled"] .music-note{font-size:calc(12px*var(--wechat-font-scale));line-height:1.5}
 }
+
+/* Large WeChat text: give the header and cover copy real space instead of letting
+   their decorative elements sit on top of neighboring content. */
+@media(max-width:700px){
+  html[data-wechat-font-adaptation="enabled"] .site-header{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand music" "create create";
+    align-items:center;column-gap:12px;row-gap:5px;padding:8px clamp(12px,4vw,20px)
+  }
+  html[data-wechat-font-adaptation="enabled"] .wordmark{grid-area:brand;min-width:0;max-width:100%;gap:8px;letter-spacing:0}
+  html[data-wechat-font-adaptation="enabled"] .wordmark>span:last-child{min-width:0;overflow-wrap:anywhere}
+  html[data-wechat-font-adaptation="enabled"] .wordmark small{letter-spacing:.8px}
+  html[data-wechat-font-adaptation="enabled"] .mobile-music-toggle{grid-area:music;justify-self:end}
+  html[data-wechat-font-adaptation="enabled"] .header-create{grid-area:create;justify-self:stretch;width:100%;max-width:none;min-width:0;margin:0;padding:7px 10px}
+  html[data-wechat-font-adaptation="enabled"] .received-label{gap:8px;min-height:0;padding:7px 10px}
+  html[data-wechat-font-adaptation="enabled"] .received-label svg{flex:none}
+  .card-stage{border:0;border-radius:0;box-shadow:none}
+  .card-stage .stage-frame{display:none}
+  .card-stage.page-0>.card-content,.card-stage.page-0 .cover-layout{height:auto;min-height:clamp(560px,calc(100dvh - 285px),700px)}
+  .card-stage.page-0 .cover-copy{padding-bottom:12px}
+  .card-stage.page-0 .cover-poem{position:relative;inset:auto;align-items:flex-start;max-width:calc(100% - 36px);margin:8px 18px 26px;padding:8px 10px;background:#f5f1e6d9;border-radius:3px;line-height:1.7;overflow-wrap:anywhere}
+  .card-stage.page-0 .cover-poem span{max-width:100%;line-height:1.7}
+  .card-stage.page-0 .cover-poem small{margin-top:5px}
+}
+
+/* The two nested outlines made the reading card look like a framed panel. */
+.card-stage .stage-frame{display:none}
+.card-stage{border-color:transparent;box-shadow:none}
