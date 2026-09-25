@@ -292,7 +292,7 @@ function ShareDialog({ gift, onClose, notify }: { gift: Gift; onClose: () => voi
 
 async function renderPoster(gift: Gift, qr: string): Promise<string> {
   await document.fonts.ready;
-  await document.fonts.load('600 31px "Noto Serif SC"');
+  await document.fonts.load('400 31px "Moonlit Kai"');
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1600;
   const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
   const loadImage = (url: string) => new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = url; });
@@ -302,20 +302,20 @@ async function renderPoster(gift: Gift, qr: string): Promise<string> {
   ctx.drawImage(landscape, 0, 0, 1080, 720);
   const fade = ctx.createLinearGradient(0, 430, 0, 745); fade.addColorStop(0, '#f5f2e900'); fade.addColorStop(1, '#f5f2e9'); ctx.fillStyle = fade; ctx.fillRect(0, 430, 1080, 320);
   ctx.strokeStyle = '#b9ab8c'; ctx.lineWidth = 2; ctx.strokeRect(36, 36, 1008, 1528);
-  ctx.textAlign = 'center'; ctx.fillStyle = '#4d6251'; ctx.font = '600 32px "Noto Serif SC", "Songti SC", serif'; ctx.fillText('月 下 寄 心 意', 540, 110);
-  ctx.font = '600 38px "Noto Serif SC", "Songti SC", serif'; ctx.fillText(`致 ${gift.recipient || theme.label}`, 540, 580);
-  ctx.font = '600 68px "Noto Serif SC", "Songti SC", serif'; ctx.fillStyle = '#354d3e'; ctx.fillText(theme.title.join(''), 540, 675, 930);
-  ctx.font = '600 31px "Noto Serif SC", "Songti SC", serif'; ctx.fillStyle = '#5d655b';
+  ctx.textAlign = 'center'; ctx.fillStyle = '#4d6251'; ctx.font = '400 32px "Moonlit Kai", serif'; ctx.fillText('月 下 寄 心 意', 540, 110);
+  ctx.font = '400 38px "Moonlit Kai", serif'; ctx.fillText(`致 ${gift.recipient || theme.label}`, 540, 580);
+  ctx.font = '600 68px "Moonlit Kai", serif'; ctx.fillStyle = '#354d3e'; ctx.fillText(theme.title.join(''), 540, 675, 930);
+  ctx.font = '400 31px "Moonlit Kai", serif'; ctx.fillStyle = '#5d655b';
   const text = gift.message || theme.short;
   const lines: string[] = []; let line = '';
   for (const char of text) { if (char === '\n') { lines.push(line); line = ''; } else if (ctx.measureText(line + char).width > 820) { lines.push(line); line = char; } else line += char; }
   if (line) lines.push(line);
   const visible = lines.slice(0, 6); if (lines.length > 6) visible[5] = visible[5].slice(0, -1) + '…';
   visible.forEach((l, i) => ctx.fillText(l, 540, 760 + i * 50));
-  ctx.font = '600 28px "Noto Serif SC", "Songti SC", serif'; ctx.fillText(`— ${gift.sender || '一位惦念你的人'} 敬赠`, 540, 1110);
+  ctx.font = '400 28px "Moonlit Kai", serif'; ctx.fillText(`— ${gift.sender || '一位惦念你的人'} 敬赠`, 540, 1110);
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(code, 400, 1130, 280, 280);
-  ctx.fillStyle = '#354d3e'; ctx.font = '600 27px "Noto Serif SC", "Songti SC", serif'; ctx.fillText('长按识别 · 听一曲温柔的祝福', 540, 1445);
+  ctx.fillStyle = '#354d3e'; ctx.font = '400 27px "Moonlit Kai", serif'; ctx.fillText('长按识别 · 听一曲温柔的祝福', 540, 1445);
   ctx.fillStyle = '#85877b'; ctx.font = '22px sans-serif'; ctx.fillText('由 岩火AI教育 温暖支持', 540, 1515);
   return canvas.toDataURL('image/png');
 }
